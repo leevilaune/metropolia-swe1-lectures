@@ -8,6 +8,10 @@ public class TemperatureConverter {
     public double celsiusToFahrenheit(double c){
         return (c*((double) 9 /5)+32);
     }
+
+    public double kelvinToCelsius(double k){
+        return k - 273.15;
+    }
     public boolean isExtreme(double c){
         if(c > 50){
             return true;
