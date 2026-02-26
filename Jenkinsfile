@@ -39,7 +39,7 @@ pipeline {
 
         stage('Copy Artifact to Server') {
             steps {
-                sh "scp -i ${shell-metropolia-fi-ssh} -r target/site ${shell-path}/tempconverter-jacoco"
+                sh "scp -i ~/.ssh/leevivl-875.pem -r target/site leevivl@shell.metropolia.fi:/home1-2/l/leevivl/public_html/tempconverter_jacoco"
             }
         }
 
