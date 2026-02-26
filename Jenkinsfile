@@ -39,9 +39,7 @@ pipeline {
 
         stage('Copy Artifact to Server') {
             steps {
-                sshagent(['shell-metropolia-fi-ssh']) {
-                    sh "scp -o StrictHostKeyChecking=no -r target/site ${shell-path}/tempconverter-jacoco"
-                }
+                sh "scp -i ${shell-metropolia-fi-ssh} -r target/site ${shell-path}/tempconverter-jacoco"
             }
         }
 
