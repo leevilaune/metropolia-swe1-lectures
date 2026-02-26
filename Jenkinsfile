@@ -8,7 +8,7 @@ pipeline {
     environment {
         PATH = "/opt/homebrew/bin:/Applications/Docker.app/Contents/Resources/bin:${env.PATH}"
         DOCKERHUB_CREDENTIALS_ID = 'docker-pat'
-        DOCKERHUB_REPO = 'leevivl/metropolia-swe1-tempconverter'
+        DOCKERHUB_REPO = 'leevivl/metropolia-tempconvert'
         DOCKER_IMAGE_TAG = 'latest'
 
         SSH_KEY_PATH = '~/.ssh/leevivl-875.pem'
@@ -53,11 +53,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh """
-                    # Build Docker image using only your local Dockerfile
-                    /opt/homebrew/bin/docker build \
-                    -f Dockerfile
-                """
+                sh "/opt/homebrew/bin/docker build -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
             }
         }
 
