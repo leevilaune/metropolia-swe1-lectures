@@ -37,9 +37,11 @@ pipeline {
             }
         }
 
-        stage('Publish Coverage Report') {
+        stage('Copy Artifact to Server') {
             steps {
-                jacoco()
+                sshagent(['shell-metropolia-fi-ssh']) {
+                    sh "scp -o StrictHostKeyChecking=no -r target/site ${shell-path}/tempconverter-jacoco"
+                }
             }
         }
 
