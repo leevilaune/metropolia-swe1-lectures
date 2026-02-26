@@ -4,7 +4,7 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package
 
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:21-jdk-slim
 WORKDIR /app
 COPY --from=builder /app/target/designpatterns-1.0-SNAPSHOT.jar app.jar
 CMD ["java","-jar","app.jar"]
