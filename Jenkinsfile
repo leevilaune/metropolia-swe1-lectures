@@ -20,7 +20,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/leevilaune/metropolia-swe1-lectures.git'
+                git branch: 'main', url: 'https://github.com/leevilaune/metropolia-swe1-lectures.git'
             }
         }
 
