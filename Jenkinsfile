@@ -53,7 +53,11 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "/opt/homebrew/bin/docker build -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
+                sh """
+                    # Build Docker image using only your local Dockerfile
+                    /opt/homebrew/bin/docker build \
+                    -f Dockerfile
+                """
             }
         }
 
