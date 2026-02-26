@@ -51,20 +51,23 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Multi-Arch Docker Image') {
             steps {
-                sh "/opt/homebrew/bin/docker build -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
-            }
-        }
-
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS_ID}",
-                                                 usernameVariable: 'DOCKER_USER',
-                                                 passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: "${DOCKERHUB_CREDENTIALS_ID}",
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
                     sh """
+                        # Login to Docker Hub
                         echo $DOCKER_PASS | /opt/homebrew/bin/docker login -u $DOCKER_USER --password-stdin
-                        /opt/homebrew/bin/docker push ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}
+
+                        # Build multi-arch image and push directly
+                        /opt/homebrew/bin/docker buildx build \
+                            --platform linux/amd64,linux/arm64 \
+                            -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} \
+                            --push \
+                            .
                     """
                 }
             }
