@@ -10,6 +10,11 @@ pipeline {
         DOCKERHUB_CREDENTIALS_ID = 'docker-pat'
         DOCKERHUB_REPO = 'leevivl/metropolia-swe1-tempconverter'
         DOCKER_IMAGE_TAG = 'latest'
+
+        SSH_KEY_PATH = '~/.ssh/leevivl-875.pem'
+        REMOTE_USER = 'leevivl'
+        REMOTE_HOST = 'shell.metropolia.fi'
+        REMOTE_PATH = '/home1-2/l/leevivl/public_html/tempconverter_jacoco'
     }
 
     stages {
@@ -39,24 +44,28 @@ pipeline {
 
         stage('Copy Artifact to Server') {
             steps {
-                sh "scp -i ~/.ssh/leevivl-875.pem -r target/site leevivl@shell.metropolia.fi:/home1-2/l/leevivl/public_html/tempconverter_jacoco"
+                sh """
+                    chmod 600 ${SSH_KEY_PATH}
+                    scp -i ${SSH_KEY_PATH} -o StrictHostKeyChecking=no -r target/site ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}
+                """
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}")
-                }
+                sh "/opt/homebrew/bin/docker build -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
             }
         }
 
         stage('Push Docker Image to Docker Hub') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
-                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
-                    }
+                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS_ID}",
+                                                 usernameVariable: 'DOCKER_USER',
+                                                 passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo $DOCKER_PASS | /opt/homebrew/bin/docker login -u $DOCKER_USER --password-stdin
+                        /opt/homebrew/bin/docker push ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}
+                    """
                 }
             }
         }
