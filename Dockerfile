@@ -4,7 +4,7 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package
 
-FROM openjdk:17-jdk
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 COPY --from=builder /app/target/designpatterns-1.0-SNAPSHOT.jar app.jar
 CMD ["java","-jar","app.jar"]
